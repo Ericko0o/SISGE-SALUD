@@ -71,40 +71,74 @@ app.use(session({
   cookie: { httpOnly: true, sameSite: 'lax' }
 }));
 
-// ---------------------- RUTA PRINCIPAL ---------------------- //
+
+// ------------------------------------------------------------- //
+// ---------------------- RUTAS FRONTEND ----------------------- //
+// ------------------------------------------------------------- //
+
+// 👉 Redirigir raíz a la página pública de inicio
 app.get('/', (req, res) => {
-  const filePath = path.join(__dirname, 'HTML', 'index.html');
-  if (!fs.existsSync(filePath)) {
-    return res.send(`
-      <h2 style="font-family: sans-serif; color: red;">❌ No se encontró /HTML/index.html</h2>
-      <p>Revisa la ruta o el nombre del archivo.</p>
-    `);
-  }
-  res.sendFile(filePath);
+  res.redirect('/inicio');
+});
+
+// 👉 Página principal pública
+app.get('/inicio', (req, res) => {
+  res.sendFile(path.join(__dirname, 'HTML', 'inicio.html'));
+});
+
+// 👉 Página de Login
+app.get('/login', (req, res) => {
+
+  // ⚠️ Aquí luego agregamos validación:
+  // if (req.session.usuario) return res.redirect('/dashboard-' + req.session.rol);
+
+  res.sendFile(path.join(__dirname, 'HTML', 'login.html'));
+});
+
+// 👉 Página de Registro de Pacientes
+app.get('/registro-paciente', (req, res) => {
+  res.sendFile(path.join(__dirname, 'HTML', 'registro_paciente.html'));
+});
+
+// ------------------------------------------------------------- //
+// ---------------------- ROL: PACIENTE ------------------------ //
+// ------------------------------------------------------------- //
+
+// Dashboard Paciente
+app.get('/paciente', (req, res) => {
+  res.sendFile(path.join(__dirname, 'HTML', 'paciente.html'));
+});
+
+// Alias opcional: dashboard-paciente
+app.get('/dashboard-paciente', (req, res) => {
+  res.redirect('/paciente');
 });
 
 
-// Sesión temporal (aún sin login real)
-app.get('/api/session', (req, res) => {
-  res.json({
-    rol: null,
-    usuario: null
-  });
+
+// ------------------------------------------------------------- //
+// --------------- LUGARES DONDE IRÁN LAS API ------------------ //
+// ------------------------------------------------------------- //
+
+/*
+
+// POST /api/login
+app.post('/api/login', async (req, res) => {
+    // Lógica de login aquí
 });
 
-// Logout básico
-app.post('/logout', (req, res) => {
-  req.session.destroy(() => {
-    res.json({ ok: true });
-  });
+// POST /api/registro-paciente
+app.post('/api/registro-paciente', async (req, res) => {
+    // Insert en BD
 });
+
+*/
 
 
 // ---------------------- INICIAR SERVIDOR ---------------------- //
 app.listen(port, () => {
   console.log(`🚀 Servidor SISGE-SALUD corriendo en http://localhost:${port}`);
   console.log(`👉 Pagina principal: http://localhost:${port}/`);
-  console.log(`👉 Carpeta HTML: http://localhost:${port}/HTML/`);
 });
 
 process.on('uncaughtException', err => console.error(err));

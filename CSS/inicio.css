@@ -1,0 +1,28 @@
+.inicio-container {
+    text-align: center;
+    margin-top: 90px;
+}
+
+.inicio-container h1 {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.inicio-botones {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.btn {
+    background: #0a4a7a;
+    padding: 12px 25px;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
+.btn.secundario {
+    background: #5c8fb3;
+}
