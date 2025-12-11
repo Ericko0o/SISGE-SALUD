@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISGE-SALUD - Paciente</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-hospital-alt"></i>
+                <h2>SISGE<span>SALUD</span></h2>
+            </div>
+        </div>
+        
+        <div class="sidebar-user">
+            <div class="user-avatar">
+                <i class="fas fa-user-injured"></i>
+            </div>
+            <div class="user-info">
+                <h3 id="userName">Cargando...</h3>
+                <span class="user-role">Paciente</span>
+            </div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="#dashboard" class="nav-item active" id="navDashboard">
+                <i class="fas fa-home"></i> Inicio
+            </a>
+            <a href="#perfil" class="nav-item" id="navPerfil">
+                <i class="fas fa-user"></i> Mi Perfil
+            </a>
+            <a href="#citas" class="nav-item" id="navCitas">
+                <i class="fas fa-calendar-alt"></i> Mis Citas
+            </a>
+            <a href="#recetas" class="nav-item" id="navRecetas">
+                <i class="fas fa-prescription-bottle-alt"></i> Mis Recetas
+            </a>
+            <a href="#examenes" class="nav-item" id="navExamenes">
+                <i class="fas fa-file-medical"></i> Mis Exámenes
+            </a>
+            <a href="#" class="nav-item logout" id="navLogout">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="content-header">
+            <div class="header-title">
+                <h1 id="pageTitle">Dashboard Paciente</h1>
+                <p id="pageSubtitle">Bienvenido al sistema de gestión de salud</p>
+            </div>
+            <div class="header-actions">
+            <button class="btn btn-primary" id="btnNuevaCita">
+                <i class="fas fa-plus"></i> Nueva Cita
+            </button>
+            <div class="notifications">
+                <i class="fas fa-bell"></i>
+                <span class="badge">3</span>
+            </div>
+        </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="content-area" id="contentArea">
+            <!-- Dashboard será cargado aquí por defecto -->
+            <div class="loading-section">
+                <i class="fas fa-spinner fa-spin"></i> Cargando información...
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal para nueva cita -->
+    <div class="modal" id="newAppointmentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Agendar Nueva Cita</h3>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="appointmentForm">
+                    <div class="form-group">
+                        <label for="appointmentDoctor">
+                            <i class="fas fa-user-md"></i> Doctor
+                        </label>
+                        <select id="appointmentDoctor" required>
+                            <option value="">Seleccionar doctor...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="appointmentHospital">
+                            <i class="fas fa-hospital"></i> Hospital (Opcional)
+                        </label>
+                        <select id="appointmentHospital">
+                            <option value="">Seleccionar hospital...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="appointmentDate">
+                            <i class="fas fa-calendar"></i> Fecha y Hora
+                        </label>
+                        <input type="datetime-local" id="appointmentDate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="appointmentReason">
+                            <i class="fas fa-comment-medical"></i> Motivo (Opcional)
+                        </label>
+                        <textarea id="appointmentReason" rows="3" placeholder="Describe brevemente el motivo de tu consulta"></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-calendar-plus"></i> Agendar Cita
+                        </button>
+                        <button type="button" class="btn btn-outline" onclick="closeModal()">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Inicializar configuración
+document.addEventListener('DOMContentLoaded', function() {
+    // Tu código de autenticación aquí...
+    
+    // Después de autenticar, inicializar config
+    // Define Config primero si no existe
+    if (typeof Config === 'undefined') {
+        var Config = {};
+    }
+
+    // Luego usa Config
+Config.someSetting = 'value';
+});
+        // Token y usuario
+        let token = localStorage.getItem('token');
+        let user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        // Verificar autenticación
+        if(!token || user.rol !== 'Paciente') {
+            window.location.href = '/login.html';
+        }
+        
+        // Cargar datos iniciales
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Mostrar nombre del usuario
+            document.getElementById('userName').textContent = user.nombre || 'Paciente';
+            
+            // Verificar token
+            try {
+                const response = await fetch('/api/verify-token', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if(!response.ok) {
+                    throw new Error('Token inválido');
+                }
+                
+                // Cargar dashboard por defecto
+                loadSection('dashboard',false,null);
+                
+            } catch (error) {
+                logout();
+            }
+        });
+        
+        // Funciones para cargar secciones
+        async function loadSection(section, showModal = false, event = null) {
+            console.log('Cargando sección:', section, 'Evento:', event);
+            
+            const contentArea = document.getElementById('contentArea');
+            
+            // Actualizar navegación activa solo si hay evento y target
+            if (event && event.target && event.target.classList.contains('nav-item')) {
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                event.target.classList.add('active');
+            } else if (event === null) {
+                // Si es carga inicial, activar el dashboard
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.textContent.includes('Inicio') || item.textContent.includes('home')) {
+                        item.classList.add('active');
+                    }
+                });
+            }
+            
+            // Mostrar loading
+            contentArea.innerHTML = `
+                <div class="loading-section">
+                    <i class="fas fa-spinner fa-spin"></i> Cargando ${section}...
+                    <p class="loading-sub">Por favor espera</p>
+                </div>
+            `;
+            
+            // Agregar timeout para evitar cargas infinitas
+            const timeout = setTimeout(() => {
+                if (contentArea.querySelector('.loading-section')) {
+                    contentArea.innerHTML += `
+                        <div class="loading-timeout">
+                            <p>La carga está tardando más de lo normal...</p>
+                            <button class="btn btn-small" onclick="loadSection('${section}', false, null)">
+                                <i class="fas fa-redo"></i> Reintentar
+                            </button>
+                        </div>
+                    `;
+                }
+            }, 8000);
+            
+    try {
+        // Cargar sección específica
+        if(section === 'dashboard') {
+            await loadDashboard();
+        } else if(section === 'perfil') {
+            await loadPerfil();
+        } else if(section === 'citas') {
+            await loadCitas();
+            if(showModal) {
+                setTimeout(() => openModal(), 300);
+            }
+        } else if(section === 'recetas') {
+            await loadRecetas();
+        } else if(section === 'examenes') {
+            await loadExamenes();
+        }
+        
+        clearTimeout(timeout);
+        
+    } catch (error) {
+        clearTimeout(timeout);
+        console.error(`Error cargando ${section}:`, error);
+        showError(`Error al cargar ${section}: ${error.message}`);
+    }
+}
+        
+        async function loadDashboard() {
+            try {
+                // Obtener perfil con estadísticas
+                const response = await fetch('/api/perfil', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if(data.success) {
+                    const perfil = data.perfil;
+                    const detalles = perfil.detalles || {};
+                    
+                    // Actualizar título
+                    document.getElementById('pageTitle').textContent = 'Dashboard Paciente';
+                    document.getElementById('pageSubtitle').textContent = `Bienvenido, ${perfil.nombre}`;
+                    
+                    // Mostrar dashboard
+                    const contentArea = document.getElementById('contentArea');
+                    contentArea.innerHTML = `
+                        <div class="dashboard">
+                            <div class="dashboard-header">
+                                <h2>Resumen de tu Salud</h2>
+                                <p>Aquí tienes un resumen de tu actividad médica</p>
+                            </div>
+                            
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <h3>${detalles.total_citas || 0}</h3>
+                                        <p>Citas Totales</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="stat-card">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <h3>${detalles.citas_pendientes || 0}</h3>
+                                        <p>Citas Pendientes</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="stat-card">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-prescription-bottle-alt"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <h3 id="totalRecetas">...</h3>
+                                        <p>Recetas Activas</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="stat-card">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-file-medical"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <h3 id="totalExamenes">...</h3>
+                                        <p>Exámenes Realizados</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="dashboard-sections">
+                                <div class="section-card">
+                                    <h3><i class="fas fa-calendar-check"></i> Próxima Cita</h3>
+                                    <div id="nextAppointment" class="loading-item">
+                                        <i class="fas fa-spinner fa-spin"></i> Cargando...
+                                    </div>
+                                </div>
+                                
+                                <div class="section-card">
+                                    <h3><i class="fas fa-history"></i> Acciones Rápidas</h3>
+                                    <div class="quick-actions">
+                                        <button class="btn btn-primary" onclick="loadSection('citas', true)">
+                                            <i class="fas fa-calendar-plus"></i> Agendar Cita
+                                        </button>
+                                        <button class="btn btn-secondary" onclick="loadSection('recetas')">
+                                            <i class="fas fa-prescription-bottle-alt"></i> Ver Recetas
+                                        </button>
+                                        <button class="btn btn-outline" onclick="loadSection('examenes')">
+                                            <i class="fas fa-file-medical-alt"></i> Ver Exámenes
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Cargar datos adicionales
+                    loadDashboardData();
+                }
+                
+            } catch (error) {
+                console.error('Error cargando dashboard:', error);
+                showError('Error al cargar el dashboard');
+            }
+        }
+        
+        async function loadDashboardData() {
+            try {
+                // Cargar recetas y exámenes para estadísticas
+                const [recetasRes, examenesRes] = await Promise.all([
+                    fetch('/api/recetas/paciente', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    }),
+                    fetch('/api/examenes/paciente', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    })
+                ]);
+                
+                const recetasData = await recetasRes.json();
+                const examenesData = await examenesRes.json();
+                
+                if(recetasData.success) {
+                    document.getElementById('totalRecetas').textContent = recetasData.recetas?.length || 0;
+                }
+                
+                if(examenesData.success) {
+                    document.getElementById('totalExamenes').textContent = examenesData.examenes?.length || 0;
+                }
+                
+                // Cargar próxima cita
+                const citasRes = await fetch('/api/citas/paciente', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const citasData = await citasRes.json();
+                if(citasData.success && citasData.citas && citasData.citas.length > 0) {
+                    // Filtrar citas futuras
+                    const ahora = new Date();
+                    const citasFuturas = citasData.citas.filter(cita => {
+                        const fechaCita = new Date(cita.fecha_hora);
+                        return fechaCita > ahora && cita.estado !== 'Cancelada';
+                    });
+                    
+                    if(citasFuturas.length > 0) {
+                        const proximaCita = citasFuturas[0];
+                        const fecha = new Date(proximaCita.fecha_hora);
+                        const fechaFormateada = fecha.toLocaleDateString('es-ES', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                        
+                        document.getElementById('nextAppointment').innerHTML = `
+                            <div class="appointment-info">
+                                <p><strong>Doctor:</strong> ${proximaCita.doctor_nombre || 'No especificado'}</p>
+                                <p><strong>Fecha:</strong> ${fechaFormateada}</p>
+                                <p><strong>Estado:</strong> <span class="status ${proximaCita.estado.toLowerCase()}">${proximaCita.estado}</span></p>
+                            </div>
+                        `;
+                    } else {
+                        document.getElementById('nextAppointment').innerHTML = `
+                            <div class="no-data">
+                                <i class="fas fa-calendar-times"></i>
+                                <p>No tienes citas programadas</p>
+                                <button class="btn btn-primary btn-small" onclick="loadSection('citas', true)">
+                                    Agendar ahora
+                                </button>
+                            </div>
+                        `;
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error cargando datos del dashboard:', error);
+            }
+        }
+        
+        async function loadPerfil() {
+            try {
+                const response = await fetch('/api/perfil', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if(data.success) {
+                    const perfil = data.perfil;
+                    const detalles = perfil.detalles || {};
+                    
+                    // Actualizar título
+                    document.getElementById('pageTitle').textContent = 'Mi Perfil';
+                    document.getElementById('pageSubtitle').textContent = 'Información personal y médica';
+                    
+                    // Mostrar perfil
+                    const contentArea = document.getElementById('contentArea');
+                    contentArea.innerHTML = `
+                        <div class="profile-section">
+                            <div class="profile-header">
+                                <div class="profile-avatar">
+                                    <i class="fas fa-user-injured"></i>
+                                </div>
+                                <div class="profile-info">
+                                    <h2>${detalles.nombres || ''} ${detalles.apellidos || ''}</h2>
+                                    <p><i class="fas fa-user-tag"></i> Paciente</p>
+                                    <p><i class="fas fa-envelope"></i> ${user.email}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="profile-details">
+                                <div class="detail-card">
+                                    <h3><i class="fas fa-id-card"></i> Información Personal</h3>
+                                    <div class="detail-grid">
+                                        <div class="detail-item">
+                                            <label>DNI:</label>
+                                            <span>${detalles.dni || 'No registrado'}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <label>Fecha de Nacimiento:</label>
+                                            <span>${detalles.fecha_nacimiento ? new Date(detalles.fecha_nacimiento).toLocaleDateString('es-ES') : 'No registrada'}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <label>Sexo:</label>
+                                            <span>${detalles.sexo || 'No registrado'}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <label>Edad:</label>
+                                            <span>${detalles.fecha_nacimiento ? calcularEdad(detalles.fecha_nacimiento) + ' años' : 'No registrada'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="detail-card">
+                                    <h3><i class="fas fa-chart-bar"></i> Estadísticas</h3>
+                                    <div class="detail-grid">
+                                        <div class="detail-item">
+                                            <label>Citas Totales:</label>
+                                            <span>${detalles.total_citas || 0}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <label>Citas Pendientes:</label>
+                                            <span>${detalles.citas_pendientes || 0}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <label>Usuario desde:</label>
+                                            <span>${user.creado_en ? new Date(user.creado_en).toLocaleDateString('es-ES') : 'Fecha no disponible'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="profile-actions">
+                                <button class="btn btn-outline" onclick="editarPerfil()">
+                                    <i class="fas fa-edit"></i> Editar Información
+                                </button>
+                                <button class="btn btn-outline" onclick="cambiarPassword()">
+                                    <i class="fas fa-key"></i> Cambiar Contraseña
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('Error cargando perfil:', error);
+                showError('Error al cargar el perfil');
+            }
+        }
+        
+        async function loadCitas() {
+            try {
+                const response = await fetch('/api/citas/paciente', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                // Actualizar título
+                document.getElementById('pageTitle').textContent = 'Mis Citas';
+                document.getElementById('pageSubtitle').textContent = 'Gestiona tus citas médicas';
+                
+                const contentArea = document.getElementById('contentArea');
+                
+                if(data.success && data.citas && data.citas.length > 0) {
+                    contentArea.innerHTML = `
+                        <div class="citas-section">
+                            <div class="section-header">
+                                <h2>Mis Citas Médicas</h2>
+                                <button class="btn btn-primary" onclick="openModal()">
+                                    <i class="fas fa-plus"></i> Nueva Cita
+                                </button>
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Fecha y Hora</th>
+                                            <th>Doctor</th>
+                                            <th>Hospital</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="citasTableBody">
+                                        ${data.citas.map(cita => `
+                                            <tr>
+                                                <td>
+                                                    <strong>${new Date(cita.fecha_hora).toLocaleDateString('es-ES')}</strong><br>
+                                                    <small>${new Date(cita.fecha_hora).toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'})}</small>
+                                                </td>
+                                                <td>${cita.doctor_nombre || 'No especificado'}</td>
+                                                <td>${cita.hospital_nombre || 'No especificado'}</td>
+                                                <td>
+                                                    <span class="status ${cita.estado.toLowerCase()}">
+                                                        ${cita.estado}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div class="action-buttons">
+                                                        ${cita.estado === 'Pendiente' ? `
+                                                            <button class="btn-icon" title="Cancelar cita" onclick="cancelarCita('${cita.id_cita}')">
+                                                                <i class="fas fa-times"></i>
+                                                            </button>
+                                                        ` : ''}
+                                                        <button class="btn-icon" title="Ver detalles" onclick="verDetallesCita('${cita.id_cita}')">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    contentArea.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-calendar-times"></i>
+                            <h3>No tienes citas programadas</h3>
+                            <p>Comienza agendando tu primera cita médica</p>
+                            <button class="btn btn-primary" onclick="openModal()">
+                                <i class="fas fa-calendar-plus"></i> Agendar mi primera cita
+                            </button>
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('Error cargando citas:', error);
+                showError('Error al cargar las citas');
+            }
+        }
+        
+        async function loadRecetas() {
+            try {
+                const response = await fetch('/api/recetas/paciente', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                // Actualizar título
+                document.getElementById('pageTitle').textContent = 'Mis Recetas';
+                document.getElementById('pageSubtitle').textContent = 'Historial de medicamentos recetados';
+                
+                const contentArea = document.getElementById('contentArea');
+                
+                if(data.success && data.recetas && data.recetas.length > 0) {
+                    contentArea.innerHTML = `
+                        <div class="recetas-section">
+                            <div class="section-header">
+                                <h2>Mis Recetas Médicas</h2>
+                                <p>${data.recetas.length} receta(s) encontrada(s)</p>
+                            </div>
+                            
+                            <div class="recetas-grid">
+                                ${data.recetas.map(receta => `
+                                    <div class="receta-card">
+                                        <div class="receta-header">
+                                            <h3>
+                                                <i class="fas fa-prescription-bottle-alt"></i>
+                                                Receta #${receta.id_receta.substring(0, 8)}
+                                            </h3>
+                                            <span class="receta-date">
+                                                ${new Date(receta.fecha).toLocaleDateString('es-ES')}
+                                            </span>
+                                        </div>
+                                        
+                                        <div class="receta-info">
+                                            <p><strong>Doctor:</strong> ${receta.doctor_nombre}</p>
+                                            <p><strong>Especialidad:</strong> ${receta.especialidad || 'General'}</p>
+                                            <p><strong>Tipo:</strong> ${receta.tipo_atencion}</p>
+                                        </div>
+                                        
+                                        <div class="receta-medicamentos">
+                                            <h4><i class="fas fa-pills"></i> Medicamentos:</h4>
+                                            <ul>
+                                                ${receta.medicamentos && receta.medicamentos.length > 0 ? 
+                                                    receta.medicamentos.map(med => `
+                                                        <li>
+                                                            <strong>${med.nombre}</strong>
+                                                            <small>${med.presentacion}</small>
+                                                            <span>${med.indicaciones}</span>
+                                                        </li>
+                                                    `).join('') : 
+                                                    '<li>No se especificaron medicamentos</li>'
+                                                }
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="receta-actions">
+                                            <button class="btn btn-outline btn-small" onclick="imprimirReceta('${receta.id_receta}')">
+                                                <i class="fas fa-print"></i> Imprimir
+                                            </button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    contentArea.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-prescription-bottle-alt"></i>
+                            <h3>No tienes recetas registradas</h3>
+                            <p>Tu historial de recetas aparecerá aquí después de tus consultas médicas</p>
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('Error cargando recetas:', error);
+                showError('Error al cargar las recetas');
+            }
+        }
+        
+        async function loadExamenes() {
+            try {
+                const response = await fetch('/api/examenes/paciente', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                // Actualizar título
+                document.getElementById('pageTitle').textContent = 'Mis Exámenes';
+                document.getElementById('pageSubtitle').textContent = 'Resultados y órdenes de exámenes';
+                
+                const contentArea = document.getElementById('contentArea');
+                
+                if(data.success && data.examenes && data.examenes.length > 0) {
+                    contentArea.innerHTML = `
+                        <div class="examenes-section">
+                            <div class="section-header">
+                                <h2>Mis Exámenes Médicos</h2>
+                                <p>${data.examenes.length} examen(es) encontrado(s)</p>
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Tipo de Examen</th>
+                                            <th>Estado</th>
+                                            <th>Último Resultado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${data.examenes.map(examen => `
+                                            <tr>
+                                                <td>
+                                                    <strong>${examen.tipo_examen}</strong>
+                                                </td>
+                                                <td>
+                                                    <span class="status ${examen.estado.toLowerCase().replace(' ', '-')}">
+                                                        ${examen.estado}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    ${examen.ultimo_resultado ? 
+                                                        `<span class="truncate">${examen.ultimo_resultado.substring(0, 50)}${examen.ultimo_resultado.length > 50 ? '...' : ''}</span>` : 
+                                                        '<span class="text-muted">Sin resultados aún</span>'
+                                                    }
+                                                </td>
+                                                <td>
+                                                    <div class="action-buttons">
+                                                        <button class="btn-icon" title="Ver detalles" onclick="verDetallesExamen('${examen.id_examen}')">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                        ${examen.ultimo_resultado ? `
+                                                            <button class="btn-icon" title="Descargar" onclick="descargarExamen('${examen.id_examen}')">
+                                                                <i class="fas fa-download"></i>
+                                                            </button>
+                                                        ` : ''}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    contentArea.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-file-medical-alt"></i>
+                            <h3>No tienes exámenes registrados</h3>
+                            <p>Tu historial de exámenes aparecerá aquí después de que te sean ordenados</p>
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('Error cargando exámenes:', error);
+                showError('Error al cargar los exámenes');
+            }
+        }
+        
+        // Funciones del modal de citas
+        async function openModal() {
+            const modal = document.getElementById('newAppointmentModal');
+            modal.style.display = 'flex';
+            
+            // Cargar doctores
+            try {
+                const response = await fetch('/api/doctores');
+                const data = await response.json();
+                
+                const doctorSelect = document.getElementById('appointmentDoctor');
+                doctorSelect.innerHTML = '<option value="">Seleccionar doctor...</option>';
+                
+                if(data.success && data.doctores) {
+                    data.doctores.forEach(doctor => {
+                        const option = document.createElement('option');
+                        option.value = doctor.id_doctor;
+                        option.textContent = `${doctor.nombres} ${doctor.apellidos}${doctor.especialidad ? ` - ${doctor.especialidad}` : ''}`;
+                        doctorSelect.appendChild(option);
+                    });
+                }
+                
+                // Cargar hospitales
+                const hospitalResponse = await fetch('/api/hospitales');
+                const hospitalData = await hospitalResponse.json();
+                
+                const hospitalSelect = document.getElementById('appointmentHospital');
+                hospitalSelect.innerHTML = '<option value="">Seleccionar hospital...</option>';
+                
+                if(hospitalData.success && hospitalData.hospitales) {
+                    hospitalData.hospitales.forEach(hospital => {
+                        const option = document.createElement('option');
+                        option.value = hospital.id_hospital;
+                        option.textContent = `${hospital.nombre}`;
+                        hospitalSelect.appendChild(option);
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Error cargando datos para el modal:', error);
+            }
+        }
+        
+        function closeModal() {
+            const modal = document.getElementById('newAppointmentModal');
+            modal.style.display = 'none';
+            document.getElementById('appointmentForm').reset();
+        }
+        
+        // Manejar envío de formulario de cita
+        document.getElementById('appointmentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const doctorId = document.getElementById('appointmentDoctor').value;
+            const hospitalId = document.getElementById('appointmentHospital').value || null;
+            const fechaHora = document.getElementById('appointmentDate').value;
+            
+            if(!doctorId || !fechaHora) {
+                showNotification('Por favor completa todos los campos requeridos', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/citas', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        id_doctor: doctorId,
+                        id_hospital: hospitalId,
+                        fecha_hora: fechaHora,
+                        motivo: document.getElementById('appointmentReason').value
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if(data.success) {
+                    showNotification('¡Cita agendada exitosamente!', 'success');
+                    closeModal();
+                    loadCitas(); // Recargar la sección de citas
+                } else {
+                    showNotification(data.message || 'Error al agendar la cita', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Error agendando cita:', error);
+                showNotification('Error de conexión al agendar la cita', 'error');
+            }
+        });
+        
+        // Cancelar cita
+        async function cancelarCita(citaId) {
+            if(!confirm('¿Estás seguro de cancelar esta cita?')) return;
+            
+            try {
+                const response = await fetch(`/api/citas/${citaId}/cancelar`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if(data.success) {
+                    showNotification('Cita cancelada exitosamente', 'success');
+                    loadCitas(); // Recargar citas
+                } else {
+                    showNotification(data.message || 'Error al cancelar la cita', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Error cancelando cita:', error);
+                showNotification('Error al cancelar la cita', 'error');
+            }
+        }
+        
+        // Funciones auxiliares
+        function calcularEdad(fechaNacimiento) {
+            const nacimiento = new Date(fechaNacimiento);
+            const hoy = new Date();
+            let edad = hoy.getFullYear() - nacimiento.getFullYear();
+            const mes = hoy.getMonth() - nacimiento.getMonth();
+            
+            if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+                edad--;
+            }
+            
+            return edad;
+        }
+        
+        function showNotification(message, type = 'info') {
+            // Crear notificación
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()">&times;</button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remover después de 5 segundos
+            setTimeout(() => {
+                if(notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+        
+        function showError(message) {
+            const contentArea = document.getElementById('contentArea');
+            contentArea.innerHTML = `
+                <div class="error-state">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>Error</h3>
+                    <p>${message}</p>
+                    <button class="btn btn-primary" onclick="loadSection('dashboard')">
+                        <i class="fas fa-home"></i> Volver al Inicio
+                    </button>
+                </div>
+            `;
+        }
+        
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+        
+        // Cerrar modal al hacer clic fuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('newAppointmentModal');
+            if(event.target === modal) {
+                closeModal();
+            }
+        };
+        
+        // Configurar fecha mínima para el calendario de citas
+        document.getElementById('appointmentDate').min = new Date().toISOString().slice(0, 16);
+        // Configurar event listeners después de que el DOM cargue
+document.addEventListener('DOMContentLoaded', function() {
+    // Event listeners para navegación
+    document.getElementById('navDashboard').addEventListener('click', function(e) {
+        e.preventDefault();
+        loadSection('dashboard', false, e);
+    });
+    
+    document.getElementById('navPerfil').addEventListener('click', function(e) {
+        e.preventDefault();
+        loadSection('perfil', false, e);
+    });
+    
+    document.getElementById('navCitas').addEventListener('click', function(e) {
+        e.preventDefault();
+        loadSection('citas', false, e);
+    });
+    
+    document.getElementById('navRecetas').addEventListener('click', function(e) {
+        e.preventDefault();
+        loadSection('recetas', false, e);
+    });
+    
+    document.getElementById('navExamenes').addEventListener('click', function(e) {
+        e.preventDefault();
+        loadSection('examenes', false, e);
+    });
+    
+    document.getElementById('navLogout').addEventListener('click', function(e) {
+        e.preventDefault();
+        logout();
+    });
+    
+    document.getElementById('btnNuevaCita').addEventListener('click', function(e) {
+        e.preventDefault();
+        loadSection('citas', true, e);
+    });
+    
+    // Event listeners para botones en el dashboard
+    setTimeout(() => {
+        const quickActionButtons = document.querySelectorAll('.quick-actions button');
+        quickActionButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                const text = this.textContent || this.innerText;
+                if (text.includes('Agendar Cita')) {
+                    e.preventDefault();
+                    loadSection('citas', true, e);
+                } else if (text.includes('Ver Recetas')) {
+                    e.preventDefault();
+                    loadSection('recetas', false, e);
+                } else if (text.includes('Ver Exámenes')) {
+                    e.preventDefault();
+                    loadSection('examenes', false, e);
+                }
+            });
+        });
+    }, 1000);
+});
+
+// También actualiza la función logout para usar event listener
+function logout() {
+    console.log('Cerrando sesión...');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = '/login.html';
+}
+    </script>
+</body>
+</html>

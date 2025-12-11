@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISGE-SALUD - Registro de Paciente</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-left">
+            <div class="auth-logo">
+                <i class="fas fa-hospital-alt"></i>
+                <h1>SISGE<span>SALUD</span></h1>
+            </div>
+            <div class="auth-info">
+                <h2>Registro de Paciente</h2>
+                <p>Crea tu cuenta para comenzar a gestionar tu salud de manera digital.</p>
+                <div class="auth-features">
+                    <div class="feature">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Datos protegidos</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>Agenda citas online</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-file-medical"></i>
+                        <span>Historial médico digital</span>
+                    </div>
+                </div>
+            </div>
+            <div class="auth-back">
+                <a href="/" class="btn btn-outline">
+                    <i class="fas fa-arrow-left"></i> Volver al inicio
+                </a>
+                <a href="/login.html" class="btn btn-outline">
+                    <i class="fas fa-sign-in-alt"></i> Ya tengo cuenta
+                </a>
+            </div>
+        </div>
+
+        <div class="auth-right">
+            <div class="auth-form">
+                <h2>Completa tus datos</h2>
+                <p>Todos los campos son obligatorios</p>
+                
+                <form id="registerForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="regNombres">
+                                <i class="fas fa-user"></i> Nombres
+                            </label>
+                            <input type="text" id="regNombres" placeholder="Juan Carlos" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="regApellidos">
+                                <i class="fas fa-user"></i> Apellidos
+                            </label>
+                            <input type="text" id="regApellidos" placeholder="Pérez García" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="regDni">
+                                <i class="fas fa-id-card"></i> DNI
+                            </label>
+                            <input type="text" id="regDni" placeholder="87654321" required maxlength="8" pattern="[0-9]{8}">
+                        </div>
+                        <div class="form-group">
+                            <label for="regFechaNacimiento">
+                                <i class="fas fa-calendar-alt"></i> Fecha Nacimiento
+                            </label>
+                            <input type="date" id="regFechaNacimiento" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regSexo">
+                            <i class="fas fa-venus-mars"></i> Sexo
+                        </label>
+                        <select id="regSexo" required>
+                            <option value="">Seleccionar</option>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regEmail">
+                            <i class="fas fa-envelope"></i> Correo Electrónico
+                        </label>
+                        <input type="email" id="regEmail" placeholder="tu@email.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regPassword">
+                            <i class="fas fa-lock"></i> Contraseña
+                        </label>
+                        <input type="password" id="regPassword" placeholder="Mínimo 6 caracteres" required minlength="6">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regConfirmPassword">
+                            <i class="fas fa-lock"></i> Confirmar Contraseña
+                        </label>
+                        <input type="password" id="regConfirmPassword" placeholder="Repite tu contraseña" required>
+                    </div>
+                    
+                    <div class="form-checkbox">
+                        <input type="checkbox" id="regTerms" required>
+                        <label for="regTerms">
+                            Acepto los <a href="#">términos y condiciones</a> y la <a href="#">política de privacidad</a>
+                        </label>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-user-plus"></i> Crear Cuenta
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="auth-divider">
+                    <span>¿Ya tienes cuenta?</span>
+                </div>
+                
+                <a href="/login.html" class="btn btn-secondary btn-block">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                </a>
+            </div>
+            
+            <div class="auth-message" id="authMessage"></div>
+        </div>
+    </div>
+
+    <script>
+        // Configurar fecha máxima para nacimiento (mínimo 5 años, máximo 120)
+        const fechaNacimiento = document.getElementById('regFechaNacimiento');
+        const hoy = new Date();
+        const maxDate = new Date(hoy.getFullYear() - 5, hoy.getMonth(), hoy.getDate());
+        const minDate = new Date(hoy.getFullYear() - 120, hoy.getMonth(), hoy.getDate());
+        
+        fechaNacimiento.max = maxDate.toISOString().split('T')[0];
+        fechaNacimiento.min = minDate.toISOString().split('T')[0];
+        
+        // Manejar registro
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Validar contraseñas
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                showMessage('Las contraseñas no coinciden', 'error');
+                return;
+            }
+            
+            // Validar DNI
+            const dni = document.getElementById('regDni').value;
+            if (!/^\d{8}$/.test(dni)) {
+                showMessage('El DNI debe tener 8 dígitos numéricos', 'error');
+                return;
+            }
+            
+            // Validar email
+            const email = document.getElementById('regEmail').value;
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showMessage('Por favor ingresa un email válido', 'error');
+                return;
+            }
+            
+            // Preparar datos
+            const pacienteData = {
+                dni: dni,
+                nombres: document.getElementById('regNombres').value,
+                apellidos: document.getElementById('regApellidos').value,
+                fecha_nacimiento: document.getElementById('regFechaNacimiento').value,
+                sexo: document.getElementById('regSexo').value,
+                email: email,
+                password: password
+            };
+            
+            // Mostrar loading
+            showMessage('Registrando paciente...', 'loading');
+            
+            try {
+                const response = await fetch('/api/registro', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(pacienteData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('¡Registro exitoso! Redirigiendo...', 'success');
+                    
+                    // Guardar token y redirigir
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    setTimeout(() => {
+                        window.location.href = '/paciente.html';
+                    }, 1500);
+                    
+                } else {
+                    showMessage(data.message || 'Error en el registro', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Error en registro:', error);
+                showMessage('Error de conexión. Intenta nuevamente.', 'error');
+            }
+        });
+        
+        function showMessage(message, type = 'info') {
+            const messageDiv = document.getElementById('authMessage');
+            
+            const icons = {
+                success: 'fas fa-check-circle',
+                error: 'fas fa-exclamation-circle',
+                loading: 'fas fa-spinner fa-spin',
+                info: 'fas fa-info-circle'
+            };
+            
+            const colors = {
+                success: '#27ae60',
+                error: '#e74c3c',
+                loading: '#3498db',
+                info: '#3498db'
+            };
+            
+            messageDiv.innerHTML = `
+                <div class="message ${type}" style="
+                    background: ${colors[type] + '15'};
+                    border-left: 4px solid ${colors[type]};
+                    padding: 15px;
+                    border-radius: 4px;
+                    margin-top: 20px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                ">
+                    <i class="${icons[type]}" style="color: ${colors[type]};"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            messageDiv.style.display = 'block';
+            
+            // Auto-remover mensajes después de 5 segundos (excepto loading)
+            if (type !== 'loading') {
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+        
+        // Validar DNI en tiempo real
+        document.getElementById('regDni').addEventListener('input', function(e) {
+            this.value = this.value.replace(/\D/g, '').slice(0, 8);
+        });
+        
+        // Validar contraseña en tiempo real
+        document.getElementById('regConfirmPassword').addEventListener('input', function() {
+            const password = document.getElementById('regPassword').value;
+            const confirm = this.value;
+            
+            if (confirm && password !== confirm) {
+                this.style.borderColor = '#e74c3c';
+            } else if (confirm) {
+                this.style.borderColor = '#27ae60';
+            } else {
+                this.style.borderColor = '#ddd';
+            }
+        });
+    </script>
+    
+    <style>
+        .form-checkbox {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .form-checkbox input[type="checkbox"] {
+            margin-top: 5px;
+        }
+        
+        .form-checkbox label {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        .form-checkbox a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        .form-checkbox a:hover {
+            text-decoration: underline;
+        }
+        
+        .message {
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</body>
+</html>

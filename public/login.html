@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISGE-SALUD - Iniciar Sesión</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-left">
+            <div class="auth-logo">
+                <i class="fas fa-hospital-alt"></i>
+                <h1>SISGE<span>SALUD</span></h1>
+            </div>
+            <div class="auth-info">
+                <h2>Bienvenido al Sistema</h2>
+                <p>Accede a tu cuenta para gestionar tu salud o administrar el sistema hospitalario.</p>
+                <div class="auth-features">
+                    <div class="feature">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Seguridad garantizada</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-bolt"></i>
+                        <span>Acceso rápido</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-mobile-alt"></i>
+                        <span>Totalmente responsive</span>
+                    </div>
+                </div>
+            </div>
+            <div class="auth-back">
+                <a href="/" class="btn btn-outline">
+                    <i class="fas fa-arrow-left"></i> Volver al inicio
+                </a>
+            </div>
+        </div>
+
+        <div class="auth-right">
+            <!-- Formulario de Login (por defecto) -->
+            <div class="auth-form" id="loginForm">
+                <h2>Iniciar Sesión</h2>
+                <p>Ingresa tus credenciales para acceder</p>
+                
+                <form id="loginFormElement">
+                    <div class="form-group">
+                        <label for="email">
+                            <i class="fas fa-envelope"></i> Correo Electrónico
+                        </label>
+                        <input type="email" id="email" placeholder="usuario@ejemplo.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">
+                            <i class="fas fa-lock"></i> Contraseña
+                        </label>
+                        <input type="password" id="password" placeholder="Tu contraseña" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    </button>
+                </form>
+                
+                <div class="auth-divider">
+                    <span>¿No tienes cuenta?</span>
+                </div>
+                
+                <button class="btn btn-secondary btn-block" onclick="showRegister()">
+                    <i class="fas fa-user-plus"></i> Registrarse como Paciente
+                </button>
+                
+                <div class="auth-test-accounts">
+                    <h4>Cuentas de Prueba:</h4>
+                    <div class="test-account">
+                        <strong>Paciente:</strong> juan@example.com / 123456
+                    </div>
+                    <div class="test-account">
+                        <strong>Doctor:</strong> doctor@example.com / 123456
+                    </div>
+                    <div class="test-account">
+                        <strong>Admin:</strong> admin@example.com / admin123
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario de Registro (oculto por defecto) -->
+            <div class="auth-form" id="registerForm" style="display: none;">
+                <h2>Registro de Paciente</h2>
+                <p>Crea tu cuenta para comenzar a usar el sistema</p>
+                
+                <form id="registerFormElement">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="regNombres">
+                                <i class="fas fa-user"></i> Nombres
+                            </label>
+                            <input type="text" id="regNombres" placeholder="Juan Carlos" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="regApellidos">
+                                <i class="fas fa-user"></i> Apellidos
+                            </label>
+                            <input type="text" id="regApellidos" placeholder="Pérez García" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="regDni">
+                                <i class="fas fa-id-card"></i> DNI
+                            </label>
+                            <input type="text" id="regDni" placeholder="87654321" required maxlength="8">
+                        </div>
+                        <div class="form-group">
+                            <label for="regFechaNacimiento">
+                                <i class="fas fa-calendar-alt"></i> Fecha Nacimiento
+                            </label>
+                            <input type="date" id="regFechaNacimiento">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regSexo">
+                            <i class="fas fa-venus-mars"></i> Sexo
+                        </label>
+                        <select id="regSexo">
+                            <option value="">Seleccionar</option>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regEmail">
+                            <i class="fas fa-envelope"></i> Correo Electrónico
+                        </label>
+                        <input type="email" id="regEmail" placeholder="tu@email.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regPassword">
+                            <i class="fas fa-lock"></i> Contraseña
+                        </label>
+                        <input type="password" id="regPassword" placeholder="Mínimo 6 caracteres" required minlength="6">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regConfirmPassword">
+                            <i class="fas fa-lock"></i> Confirmar Contraseña
+                        </label>
+                        <input type="password" id="regConfirmPassword" placeholder="Repite tu contraseña" required>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-user-plus"></i> Registrarse
+                        </button>
+                        <button type="button" class="btn btn-outline" onclick="showLogin()">
+                            <i class="fas fa-arrow-left"></i> Volver al Login
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Mensaje de carga/éxito/error -->
+            <div class="auth-message" id="authMessage"></div>
+        </div>
+    </div>
+
+    <script>
+        // Mostrar registro si hay parámetro en URL
+        const urlParams = new URLSearchParams(window.location.search);
+        if(urlParams.get('registro') === 'true') {
+            showRegister();
+        }
+
+        function showRegister() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            window.history.pushState({}, '', '/login.html?registro=true');
+        }
+
+        function showLogin() {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+            window.history.pushState({}, '', '/login.html');
+        }
+
+        // Login
+        document.getElementById('loginFormElement').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            const messageDiv = document.getElementById('authMessage');
+            messageDiv.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Verificando credenciales...</div>';
+            messageDiv.style.display = 'block';
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if(data.success) {
+                    messageDiv.innerHTML = '<div class="success"><i class="fas fa-check-circle"></i> ¡Inicio de sesión exitoso! Redirigiendo...</div>';
+                    
+                    // Guardar token y usuario
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    // Redirigir según rol
+                    setTimeout(() => {
+                        const rol = data.user.rol;
+                        if(rol === 'Paciente') window.location.href = '/paciente.html';
+                        else if(rol === 'Doctor') window.location.href = '/doctor.html';
+                        else if(rol === 'Administrador') window.location.href = '/admin.html';
+                        else window.location.href = '/';
+                    }, 1500);
+                    
+                } else {
+                    messageDiv.innerHTML = `<div class="error"><i class="fas fa-exclamation-circle"></i> ${data.message}</div>`;
+                }
+                
+            } catch (error) {
+                messageDiv.innerHTML = '<div class="error"><i class="fas fa-exclamation-circle"></i> Error de conexión. Verifica tu internet.</div>';
+                console.error('Error en login:', error);
+            }
+        });
+
+        // Registro
+        document.getElementById('registerFormElement').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Validar contraseñas
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            
+            if(password !== confirmPassword) {
+                const messageDiv = document.getElementById('authMessage');
+                messageDiv.innerHTML = '<div class="error"><i class="fas fa-exclamation-circle"></i> Las contraseñas no coinciden</div>';
+                messageDiv.style.display = 'block';
+                return;
+            }
+            
+            const pacienteData = {
+                dni: document.getElementById('regDni').value,
+                nombres: document.getElementById('regNombres').value,
+                apellidos: document.getElementById('regApellidos').value,
+                fecha_nacimiento: document.getElementById('regFechaNacimiento').value || null,
+                sexo: document.getElementById('regSexo').value || null,
+                email: document.getElementById('regEmail').value,
+                password: password
+            };
+            
+            const messageDiv = document.getElementById('authMessage');
+            messageDiv.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Registrando paciente...</div>';
+            messageDiv.style.display = 'block';
+            
+            try {
+                const response = await fetch('/api/registro', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(pacienteData)
+                });
+                
+                const data = await response.json();
+                
+                if(data.success) {
+                    messageDiv.innerHTML = '<div class="success"><i class="fas fa-check-circle"></i> ¡Registro exitoso! Iniciando sesión...</div>';
+                    
+                    // Guardar token y redirigir
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    setTimeout(() => {
+                        window.location.href = '/paciente.html';
+                    }, 1500);
+                    
+                } else {
+                    messageDiv.innerHTML = `<div class="error"><i class="fas fa-exclamation-circle"></i> ${data.message}</div>`;
+                }
+                
+            } catch (error) {
+                messageDiv.innerHTML = '<div class="error"><i class="fas fa-exclamation-circle"></i> Error en el registro. Intenta nuevamente.</div>';
+                console.error('Error en registro:', error);
+            }
+        });
+    </script>
+</body>
+</html>

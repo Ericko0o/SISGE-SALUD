@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISGE-SALUD - Sistema Hospitalario</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="logo">
+                <i class="fas fa-hospital-alt"></i>
+                <h1>SISGE<span>SALUD</span></h1>
+            </div>
+            <nav class="main-nav">
+                <a href="#inicio" class="active">Inicio</a>
+                <a href="#acerca">Acerca</a>
+                <a href="#servicios">Servicios</a>
+                <a href="/login.html" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                </a>
+            </nav>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero" id="inicio">
+            <div class="hero-content">
+                <h2>Gestión Hospitalaria Integral</h2>
+                <p>Sistema especializado para la administración de pacientes, doctores y recursos hospitalarios en tiempo real.</p>
+                <div class="hero-buttons">
+                    <a href="/login.html" class="btn btn-primary btn-large">
+                        <i class="fas fa-user-md"></i> Acceso Médico
+                    </a>
+                    <a href="/login.html" class="btn btn-secondary btn-large">
+                        <i class="fas fa-user-injured"></i> Pacientes
+                    </a>
+                    <a href="#registro" class="btn btn-outline btn-large">
+                        <i class="fas fa-user-plus"></i> Registrarse
+                    </a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <i class="fas fa-heartbeat"></i>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="about" id="acerca">
+            <h2>¿Qué es SISGE-SALUD?</h2>
+            <div class="about-grid">
+                <div class="about-card">
+                    <i class="fas fa-clipboard-check"></i>
+                    <h3>Citas Médicas</h3>
+                    <p>Agenda y gestiona citas médicas de forma eficiente.</p>
+                </div>
+                <div class="about-card">
+                    <i class="fas fa-file-medical"></i>
+                    <h3>Historial Clínico</h3>
+                    <p>Acceso seguro al historial médico de cada paciente.</p>
+                </div>
+                <div class="about-card">
+                    <i class="fas fa-prescription-bottle-alt"></i>
+                    <h3>Recetas Digitales</h3>
+                    <p>Recetas médicas digitalizadas y control de medicamentos.</p>
+                </div>
+                <div class="about-card">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Reportes en Tiempo Real</h3>
+                    <p>Estadísticas y reportes para toma de decisiones.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section class="services" id="servicios">
+            <h2>Nuestros Servicios</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-user-injured"></i>
+                    </div>
+                    <h3>Para Pacientes</h3>
+                    <ul>
+                        <li>Agendar citas online</li>
+                        <li>Ver historial médico</li>
+                        <li>Consultar recetas</li>
+                        <li>Resultados de exámenes</li>
+                    </ul>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <h3>Para Doctores</h3>
+                    <ul>
+                        <li>Gestión de agenda</li>
+                        <li>Historial de pacientes</li>
+                        <li>Recetas digitales</li>
+                        <li>Órdenes de exámenes</li>
+                    </ul>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <h3>Para Administración</h3>
+                    <ul>
+                        <li>Gestión de usuarios</li>
+                        <li>Control de hospitales</li>
+                        <li>Reportes estadísticos</li>
+                        <li>Auditoría del sistema</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Registration Section -->
+        <section class="registration" id="registro">
+            <div class="registration-content">
+                <h2>¿Eres nuevo paciente?</h2>
+                <p>Regístrate ahora y comienza a gestionar tu salud de manera digital.</p>
+                <a href="/login.html?registro=true" class="btn btn-primary btn-large">
+                    <i class="fas fa-user-plus"></i> Registrarme como Paciente
+                </a>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="main-footer">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <i class="fas fa-hospital-alt"></i>
+                    <h3>SISGE<span>SALUD</span></h3>
+                    <p>Sistema de Gestión Hospitalaria</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Enlaces Rápidos</h4>
+                    <a href="/login.html">Iniciar Sesión</a>
+                    <a href="#acerca">Acerca del Sistema</a>
+                    <a href="#servicios">Servicios</a>
+                </div>
+                <div class="footer-contact">
+                    <h4>Contacto</h4>
+                    <p><i class="fas fa-envelope"></i> soporte@sisgesalud.com</p>
+                    <p><i class="fas fa-phone"></i> +51 123 456 789</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 SISGE-SALUD. Todos los derechos reservados.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Navegación suave
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if(targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if(targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Mostrar formulario de registro si hay parámetro en URL
+        if(window.location.hash === '#registro') {
+            setTimeout(() => {
+                window.location.href = '/login.html?registro=true';
+            }, 500);
+        }
+    </script>
+</body>
+</html>
